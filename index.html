@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sopa de Letras Interactiva - Gestión del Talento Humano (RRHH)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* PALETA DE COLORES PASTEL */
+      --bg-gradient-start: #F6F4FE;
+      --bg-gradient-mid: #FFF5F7;
+      --bg-gradient-end: #F0FDF4;
+      
+      --pastel-lavender: #DDD6FE;
+      --pastel-lavender-deep: #7C3AED;
+      --pastel-lavender-glow: rgba(124, 58, 237, 0.2);
+      
+      --pastel-mint: #BBF7D0;
+      --pastel-mint-deep: #16A34A;
+      --pastel-mint-dark: #14532D;
+      
+      --pastel-peach: #FECDD3;
+      --pastel-peach-deep: #E11D48;
+      
+      --pastel-yellow: #FEF08A;
+      --pastel-sky: #BAE6FD;
+      --pastel-sky-deep: #0284C7;
+      
+      --card-bg: rgba(255, 255, 255, 0.88);
+      --card-border: rgba(221, 214, 254, 0.7);
+      --cell-bg: #F5F3FF;
+      --cell-hover: #EDE9FE;
+      --cell-selected: #FECDD3;
+      --cell-found: #BBF7D0;
+      
+      --text-main: #1F2937;
+      --text-muted: #6B7280;
+      --text-subtle: #9CA3AF;
+      
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 24px;
+      --shadow-soft: 0 12px 35px rgba(124, 58, 237, 0.07);
+      --shadow-hover: 0 16px 40px rgba(124, 58, 237, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      font-family: 'Outfit', sans-serif;
+      background: radial-gradient(circle at 10% 15%, var(--bg-gradient-start) 0%, var(--bg-gradient-mid) 50%, var(--bg-gradient-end) 100%);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 22px 14px 44px;
+      overflow-x: hidden;
+    }
+
+    /* TOP SWITCH NAVIGATION */
+    .nav-switch {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(8px);
+      padding: 6px;
+      border-radius: 40px;
+      border: 1px solid var(--card-border);
+      box-shadow: var(--shadow-soft);
+    }
+
+    .nav-btn {
+      padding: 7px 18px;
+      border-radius: 30px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      text-decoration: none;
+      transition: all 0.25s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .nav-btn.active {
+      background: linear-gradient(135deg, #A78BFA, #8B5CF6);
+      color: #FFFFFF;
+      box-shadow: 0 4px 14px var(--pastel-lavender-glow);
+    }
+
+    .nav-btn.inactive {
+      color: var(--text-muted);
+      background: transparent;
+    }
+
+    .nav-btn.inactive:hover {
+      color: var(--text-main);
+      background: rgba(221, 214, 254, 0.35);
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 22px;
+      max-width: 900px;
+      width: 100%;
+    }
+
+    .badge-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 16px;
+      background: #EDE9FE;
+      color: var(--pastel-lavender-deep);
+      border: 1px solid var(--pastel-lavender);
+      border-radius: 50px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-size: clamp(2rem, 4.2vw, 2.7rem);
+      font-weight: 800;
+      color: #111827;
+      letter-spacing: -0.6px;
+      line-height: 1.2;
+    }
+
+    h1 span {
+      background: linear-gradient(135deg, #7C3AED, #EC4899);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 1.02rem;
+      margin-top: 8px;
+      font-weight: 500;
+    }
+
+    /* TOP STATS BAR */
+    .dashboard-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--card-bg);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      padding: 14px 22px;
+      max-width: 1040px;
+      width: 100%;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow-soft);
+      gap: 16px;
+    }
+
+    .stat-box {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .stat-icon {
+      font-size: 1.5rem;
+      background: #F3E8FF;
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+    }
+
+    .stat-val {
+      font-weight: 800;
+      font-size: 1.25rem;
+      color: #111827;
+      letter-spacing: -0.3px;
+    }
+
+    .progress-container {
+      flex: 1;
+      min-width: 190px;
+      max-width: 330px;
+    }
+
+    .progress-bar-bg {
+      height: 12px;
+      background: #F3F4F6;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-top: 6px;
+      border: 1px solid #E5E7EB;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #A78BFA, #34D399);
+      border-radius: 20px;
+      transition: width 0.4s ease;
+      box-shadow: 0 0 10px rgba(52, 211, 153, 0.4);
+    }
+
+    .btn-action {
+      background: #FFFFFF;
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 9px 16px;
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.03);
+    }
+
+    .btn-action:hover {
+      background: #FAF5FF;
+      border-color: var(--pastel-lavender-deep);
+      transform: translateY(-1px);
+    }
+
+    .btn-hint {
+      color: #854D0E;
+      background: #FEF9C3;
+      border-color: #FEF08A;
+    }
+
+    .btn-hint:hover {
+      background: #FEF08A;
+    }
+
+    /* MAIN GAME AREA */
+    .game-area {
+      display: grid;
+      grid-template-columns: 1fr 350px;
+      gap: 26px;
+      max-width: 1040px;
+      width: 100%;
+      align-items: start;
+    }
+
+    @media (max-width: 890px) {
+      .game-area {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* GRID CONTAINER */
+    .grid-container-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 20px;
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+    }
+
+    .grid-board {
+      display: grid;
+      gap: 4px;
+      background: #FAF5FF;
+      padding: 10px;
+      border-radius: var(--radius-md);
+      touch-action: none;
+      cursor: pointer;
+      border: 1px solid #EDE9FE;
+      box-shadow: inset 0 2px 8px rgba(124, 58, 237, 0.05);
+    }
+
+    .grid-cell {
+      width: 36px;
+      height: 36px;
+      background: var(--cell-bg);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 1.15rem;
+      color: #374151;
+      transition: background 0.15s ease, transform 0.1s ease, color 0.15s ease;
+      position: relative;
+    }
+
+    @media (max-width: 540px) {
+      .grid-cell {
+        width: 23px;
+        height: 23px;
+        font-size: 0.8rem;
+        border-radius: 4px;
+      }
+      .grid-board {
+        gap: 2px;
+        padding: 4px;
+      }
+    }
+
+    .grid-cell.selected {
+      background: var(--cell-selected);
+      color: #9F1239;
+      transform: scale(0.96);
+      box-shadow: 0 0 10px rgba(254, 205, 211, 0.8);
+    }
+
+    .grid-cell.found {
+      background: var(--cell-found);
+      color: var(--pastel-mint-dark);
+      font-weight: 800;
+    }
+
+    .grid-cell.hint-pulse {
+      animation: pulseHint 1s infinite alternate;
+      border: 2px solid #CA8A04;
+    }
+
+    @keyframes pulseHint {
+      0% { transform: scale(1); background: #FEF08A; }
+      100% { transform: scale(1.15); background: #FDE047; color: #713F12; }
+    }
+
+    /* WORDS PANEL */
+    .words-panel {
+      background: var(--card-bg);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-lg);
+      padding: 22px;
+      box-shadow: var(--shadow-soft);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .words-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #EDE9FE;
+      padding-bottom: 14px;
+    }
+
+    .words-panel-header h2 {
+      font-size: 1.2rem;
+      font-weight: 800;
+      color: #111827;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .words-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 520px;
+      overflow-y: auto;
+      padding-right: 6px;
+    }
+
+    .words-list::-webkit-scrollbar {
+      width: 6px;
+    }
+    .words-list::-webkit-scrollbar-thumb {
+      background: var(--pastel-lavender);
+      border-radius: 4px;
+    }
+
+    .word-card {
+      background: #FFFFFF;
+      border: 1px solid #EDE9FE;
+      border-radius: var(--radius-sm);
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      transition: all 0.25s ease;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+    }
+
+    .word-card:hover {
+      background: #FAF5FF;
+      border-color: var(--pastel-lavender-deep);
+      transform: translateX(2px);
+    }
+
+    .word-card-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .word-term {
+      font-weight: 800;
+      font-size: 0.98rem;
+      letter-spacing: 0.5px;
+      color: #1F2937;
+    }
+
+    .word-status-icon {
+      font-size: 0.92rem;
+      color: var(--text-subtle);
+    }
+
+    .word-meaning {
+      font-size: 0.85rem;
+      color: var(--pastel-lavender-deep);
+      font-weight: 700;
+      display: none;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .word-detail {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+      display: none;
+      margin-top: 4px;
+      padding-top: 5px;
+      border-top: 1px dashed #EDE9FE;
+    }
+
+    .word-card.found {
+      background: rgba(187, 247, 208, 0.28);
+      border-color: #86EFAC;
+    }
+
+    .word-card.found .word-term {
+      text-decoration: line-through;
+      color: #6B7280;
+    }
+
+    .word-card.found .word-status-icon {
+      color: var(--pastel-mint-deep);
+      font-weight: bold;
+    }
+
+    .word-card.found .word-meaning,
+    .word-card.found .word-detail {
+      display: block;
+    }
+
+    /* PASTEL DISCOVERY TOAST */
+    .discovery-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #FFFFFF;
+      border: 2px solid #86EFAC;
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      box-shadow: 0 16px 45px rgba(22, 163, 74, 0.15), 0 4px 15px rgba(0, 0, 0, 0.05);
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      max-width: 390px;
+      transform: translateY(120%);
+      opacity: 0;
+      transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 100;
+    }
+
+    .discovery-toast.show {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    .toast-icon {
+      font-size: 2rem;
+      background: #DCFCE7;
+      padding: 6px;
+      border-radius: 12px;
+      flex-shrink: 0;
+    }
+
+    .toast-content h4 {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: #16A34A;
+      margin-bottom: 2px;
+      font-weight: 800;
+    }
+
+    .toast-word {
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #111827;
+    }
+
+    .toast-meaning {
+      font-size: 0.95rem;
+      color: var(--pastel-lavender-deep);
+      font-weight: 700;
+      margin-top: 2px;
+    }
+
+    .toast-desc {
+      font-size: 0.82rem;
+      color: #4B5563;
+      margin-top: 4px;
+      line-height: 1.35;
+    }
+
+    /* FINAL FEEDBACK MODAL (PASTEL STYLE) */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(17, 24, 39, 0.45);
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      z-index: 999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .modal-backdrop.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .feedback-card {
+      background: #FFFFFF;
+      border: 1px solid var(--pastel-lavender);
+      border-radius: var(--radius-lg);
+      padding: 34px 30px;
+      max-width: 680px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 25px 70px rgba(124, 58, 237, 0.2);
+      text-align: center;
+      transform: scale(0.92);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .modal-backdrop.active .feedback-card {
+      transform: scale(1);
+    }
+
+    .celebration-badge {
+      font-size: 3.4rem;
+      margin-bottom: 8px;
+      display: inline-block;
+      animation: bounce 1.5s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+
+    .feedback-title {
+      font-size: 1.9rem;
+      font-weight: 800;
+      color: #111827;
+      margin-bottom: 6px;
+    }
+
+    .feedback-subtitle {
+      color: var(--pastel-lavender-deep);
+      font-weight: 700;
+      font-size: 1.05rem;
+      margin-bottom: 22px;
+    }
+
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .kpi-item {
+      background: #F9FAFB;
+      border: 1px solid #E5E7EB;
+      border-radius: var(--radius-md);
+      padding: 12px 10px;
+    }
+
+    .kpi-label {
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 700;
+    }
+
+    .kpi-value {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #111827;
+      margin-top: 4px;
+    }
+
+    .feedback-message-box {
+      background: #F5F3FF;
+      border-left: 4px solid var(--pastel-lavender-deep);
+      padding: 14px 18px;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      text-align: left;
+      font-size: 0.94rem;
+      color: #374151;
+      line-height: 1.55;
+      margin-bottom: 24px;
+    }
+
+    .glossary-summary {
+      text-align: left;
+      margin-bottom: 24px;
+    }
+
+    .glossary-summary h3 {
+      font-size: 1.1rem;
+      font-weight: 800;
+      margin-bottom: 12px;
+      color: #111827;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .glossary-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.86rem;
+      background: #F9FAFB;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      border: 1px solid #E5E7EB;
+    }
+
+    .glossary-table th, .glossary-table td {
+      padding: 11px 14px;
+      border-bottom: 1px solid #E5E7EB;
+      text-align: left;
+    }
+
+    .glossary-table th {
+      background: #F3F4F6;
+      color: #4B5563;
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+
+    .glossary-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .tag-en {
+      font-weight: 800;
+      color: var(--pastel-lavender-deep);
+    }
+
+    .tag-es {
+      color: #16A34A;
+      font-weight: 700;
+    }
+
+    .btn-group-modal {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #A78BFA, #8B5CF6);
+      color: #FFFFFF;
+      border: none;
+      padding: 12px 26px;
+      border-radius: var(--radius-sm);
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 15px var(--pastel-lavender-glow);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px var(--pastel-lavender-glow);
+    }
+
+    .btn-secondary {
+      background: #FFFFFF;
+      color: #374151;
+      border: 1px solid #D1D5DB;
+      padding: 12px 22px;
+      border-radius: var(--radius-sm);
+      font-size: 0.92rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+      background: #F9FAFB;
+      border-color: #9CA3AF;
+    }
+
+    #confettiCanvas {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP NAVIGATION TO TOGGLE BETWEEN ACTIVITIES -->
+  <nav class="nav-switch">
+    <a href="index.html" class="nav-btn active">👥 Gestión del Talento (Pastel)</a>
+    <a href="sst.html" class="nav-btn inactive">🛡️ Seguridad y Salud (SST)</a>
+  </nav>
+
+  <header>
+    <div class="badge-tag">🌸 Human Resources • Talento Humano</div>
+    <h1>Sopa de Letras: <span>Gestión del Talento</span></h1>
+    <p class="subtitle">Encuentra los 10 términos clave del ciclo laboral en inglés y descubre su aplicación estratégica en español.</p>
+  </header>
+
+  <!-- DASHBOARD STATS -->
+  <div class="dashboard-bar">
+    <div class="stat-box">
+      <span class="stat-icon">⏱️</span>
+      <div>
+        <div style="font-size: 0.74rem; color: var(--text-muted); text-transform: uppercase; font-weight: 700;">Tiempo</div>
+        <div class="stat-val" id="timerDisplay">00:00</div>
+      </div>
+    </div>
+
+    <div class="progress-container">
+      <div style="display: flex; justify-content: space-between; font-size: 0.82rem; font-weight: 700; color: #374151;">
+        <span>Progreso</span>
+        <span id="progressText">0 / 10 Palabras</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progressBar"></div>
+      </div>
+    </div>
+
+    <div style="display: flex; gap: 8px;">
+      <button class="btn-action btn-hint" id="hintBtn" title="Resaltar la primera letra de una palabra oculta">
+        💡 Pista
+      </button>
+      <button class="btn-action" id="soundBtn" title="Activar/Desactivar sonido">
+        🔊 Sonido
+      </button>
+      <button class="btn-action" id="resetBtn" title="Reiniciar tablero">
+        🔄 Reiniciar
+      </button>
+    </div>
+  </div>
+
+  <!-- GAME AREA -->
+  <main class="game-area">
+    <!-- BOARD -->
+    <div class="grid-container-card">
+      <div id="gridBoard" class="grid-board"></div>
+      <p style="font-size: 0.8rem; color: var(--text-muted); margin-top: 14px; font-weight: 500;">
+        ✨ <b>Instrucción:</b> Haz clic o arrastra sobre las letras (horizontal, vertical o diagonal).
+      </p>
+    </div>
+
+    <!-- WORDS LIST PANEL -->
+    <div class="words-panel">
+      <div class="words-panel-header">
+        <h2>📋 Términos a Buscar</h2>
+        <span style="font-size: 0.84rem; color: var(--pastel-lavender-deep); font-weight: 800;" id="foundCounter">0 de 10</span>
+      </div>
+      <div class="words-list" id="wordsListContainer"></div>
+    </div>
+  </main>
+
+  <!-- DISCOVERY TOAST (PASTEL) -->
+  <div class="discovery-toast" id="discoveryToast">
+    <div class="toast-icon">🌸</div>
+    <div class="toast-content">
+      <h4>¡Concepto Descubierto!</h4>
+      <div class="toast-word" id="toastEnglish">RECRUITMENT</div>
+      <div class="toast-meaning" id="toastSpanish">Reclutamiento</div>
+      <div class="toast-desc" id="toastDesc">Explicación breve del concepto...</div>
+    </div>
+  </div>
+
+  <!-- RETROALIMENTACIÓN MODAL -->
+  <div class="modal-backdrop" id="feedbackModal">
+    <div class="feedback-card">
+      <div class="celebration-badge">🎉</div>
+      <h2 class="feedback-title">¡Excelente Trabajo!</h2>
+      <p class="feedback-subtitle">Has completado el mapa conceptual de Gestión del Talento Humano</p>
+
+      <div class="kpi-grid">
+        <div class="kpi-item">
+          <div class="kpi-label">Tiempo Total</div>
+          <div class="kpi-value" id="kpiTime">02:15</div>
+        </div>
+        <div class="kpi-item">
+          <div class="kpi-label">Pistas Usadas</div>
+          <div class="kpi-value" id="kpiHints">0</div>
+        </div>
+        <div class="kpi-item">
+          <div class="kpi-label">Nivel Obtenido</div>
+          <div class="kpi-value" id="kpiRank">⭐⭐⭐ Líder de RRHH</div>
+        </div>
+      </div>
+
+      <div class="feedback-message-box" id="feedbackMessage"></div>
+
+      <div class="glossary-summary">
+        <h3>📖 Ciclo de Vida del Colaborador (Glosario)</h3>
+        <table class="glossary-table">
+          <thead>
+            <tr>
+              <th>Inglés</th>
+              <th>Español</th>
+              <th>Propósito Estratégico</th>
+            </tr>
+          </thead>
+          <tbody id="glossaryTableBody"></tbody>
+        </table>
+      </div>
+
+      <div class="btn-group-modal">
+        <button class="btn-primary" onclick="initGame()">
+          🔄 Jugar de nuevo
+        </button>
+        <button class="btn-secondary" onclick="window.print()">
+          🖨️ Imprimir / Guardar reporte
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <canvas id="confettiCanvas"></canvas>
+
+  <script>
+    // 1. DATA: TÉRMINOS Y DEFINICIONES GESTIÓN DEL TALENTO HUMANO
+    const VOCABULARY = [
+      {
+        word: "RECRUITMENT",
+        meaning: "Reclutamiento",
+        detail: "Proceso estratégico de atracción, convocatoria e identificación de candidatos potencialmente calificados para la organización."
+      },
+      {
+        word: "SELECTION",
+        meaning: "Selección",
+        detail: "Evaluación rigurosa de competencias, entrevistas y pruebas técnicas/psicométricas para escoger al candidato idóneo."
+      },
+      {
+        word: "HIRING",
+        meaning: "Contratación",
+        detail: "Formalización jurídica y contractual de la vinculación laboral, definiendo deberes, condiciones y derechos mutuos."
+      },
+      {
+        word: "ONBOARDING",
+        meaning: "Inducción e integración",
+        detail: "Proceso de acogida y acompañamiento integral para adaptar al nuevo colaborador a la cultura, equipo y dinámicas de la empresa."
+      },
+      {
+        word: "TRAINING",
+        meaning: "Capacitación",
+        detail: "Programas de formación continua orientados a perfeccionar habilidades técnicas y operativas requeridas para el puesto actual."
+      },
+      {
+        word: "DEVELOPMENT",
+        meaning: "Desarrollo",
+        detail: "Estrategia formativa a largo plazo enfocada en el crecimiento profesional, plan de carrera y liderazgo del colaborador."
+      },
+      {
+        word: "COMPENSATION",
+        meaning: "Compensación",
+        detail: "Estructura de sueldos equitativos, incentivos y beneficios que retribuyen de manera justa el valor aportado por el colaborador."
+      },
+      {
+        word: "PERFORMANCE",
+        meaning: "Desempeño",
+        detail: "Evaluación periódica del logro de objetivos, calidad del trabajo y competencias demostradas en el ejercicio del rol."
+      },
+      {
+        word: "MOTIVATION",
+        meaning: "Motivación",
+        detail: "Estímulos intrínsecos y extrínsecos que potencian el compromiso, la energía positiva y la satisfacción del colaborador."
+      },
+      {
+        word: "RETENTION",
+        meaning: "Retención del talento",
+        detail: "Políticas de clima laboral y fidelización enfocadas en conservar el talento clave y reducir la rotación no deseada."
+      }
+    ];
+
+    const GRID_SIZE = 14;
+    let grid = [];
+    let placedWords = [];
+    let selectedCells = [];
+    let isMouseDown = false;
+    let timerInterval = null;
+    let secondsElapsed = 0;
+    let hintsUsed = 0;
+    let soundEnabled = true;
+
+    // Web Audio Synthesizer (Gentle Pastel Chimes)
+    const AudioEngine = {
+      ctx: null,
+      init() {
+        if (!this.ctx) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (AudioContext) this.ctx = new AudioContext();
+        }
+      },
+      playSuccess() {
+        if (!soundEnabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const notes = [523.25, 659.25, 783.99, 1046.50]; // C major gentle chord
+        notes.forEach((freq, idx) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.07);
+          gain.gain.setValueAtTime(0.12, now + idx * 0.07);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.07 + 0.35);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + idx * 0.07);
+          osc.stop(now + idx * 0.07 + 0.38);
+        });
+      },
+      playWin() {
+        if (!soundEnabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const fanfare = [523.25, 587.33, 659.25, 783.99, 880, 1046.50];
+        fanfare.forEach((freq, i) => {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now + i * 0.1);
+          gain.gain.setValueAtTime(0.16, now + i * 0.1);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.1 + 0.45);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now + i * 0.1);
+          osc.stop(now + i * 0.1 + 0.5);
+        });
+      },
+      playClick() {
+        if (!soundEnabled) return;
+        this.init();
+        if (!this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.frequency.setValueAtTime(440, this.ctx.currentTime);
+        gain.gain.setValueAtTime(0.03, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.04);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start();
+        osc.stop(this.ctx.currentTime + 0.05);
+      }
+    };
+
+    const DIRECTIONS = [
+      { r: 0, c: 1 },   // Horizontal derecha
+      { r: 1, c: 0 },   // Vertical abajo
+      { r: 1, c: 1 },   // Diagonal abajo-derecha
+      { r: 1, c: -1 },  // Diagonal abajo-izquierda
+      { r: 0, c: -1 },  // Horizontal izquierda
+      { r: -1, c: 0 },  // Vertical arriba
+      { r: -1, c: 1 },  // Diagonal arriba-derecha
+      { r: -1, c: -1 }  // Diagonal arriba-izquierda
+    ];
+
+    function generateGrid() {
+      let attempts = 0;
+      let success = false;
+
+      while (!success && attempts < 150) {
+        attempts++;
+        grid = Array.from({ length: GRID_SIZE }, () => Array(GRID_SIZE).fill(''));
+        placedWords = [];
+        let allPlaced = true;
+
+        const sortedWords = [...VOCABULARY].sort((a, b) => b.word.length - a.word.length);
+
+        for (const item of sortedWords) {
+          const word = item.word;
+          let placed = false;
+          let wordAttempts = 0;
+          const dirChoices = [...DIRECTIONS].sort(() => Math.random() - 0.5);
+
+          while (!placed && wordAttempts < 200) {
+            wordAttempts++;
+            const dir = dirChoices[Math.floor(Math.random() * dirChoices.length)];
+            const startR = Math.floor(Math.random() * GRID_SIZE);
+            const startC = Math.floor(Math.random() * GRID_SIZE);
+
+            const endR = startR + dir.r * (word.length - 1);
+            const endC = startC + dir.c * (word.length - 1);
+
+            if (endR >= 0 && endR < GRID_SIZE && endC >= 0 && endC < GRID_SIZE) {
+              let canPlace = true;
+              let path = [];
+              for (let i = 0; i < word.length; i++) {
+                const curR = startR + dir.r * i;
+                const curC = startC + dir.c * i;
+                const charInGrid = grid[curR][curC];
+                if (charInGrid !== '' && charInGrid !== word[i]) {
+                  canPlace = false;
+                  break;
+                }
+                path.push({ r: curR, c: curC });
+              }
+
+              if (canPlace) {
+                path.forEach((pos, idx) => {
+                  grid[pos.r][pos.c] = word[idx];
+                });
+                placedWords.push({
+                  word: word,
+                  meaning: item.meaning,
+                  detail: item.detail,
+                  path: path,
+                  found: false
+                });
+                placed = true;
+              }
+            }
+          }
+
+          if (!placed) {
+            allPlaced = false;
+            break;
+          }
+        }
+
+        if (allPlaced && placedWords.length === VOCABULARY.length) {
+          success = true;
+        }
+      }
+
+      // Fill empty spaces
+      const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      for (let r = 0; r < GRID_SIZE; r++) {
+        for (let c = 0; c < GRID_SIZE; c++) {
+          if (grid[r][c] === '') {
+            grid[r][c] = letters.charAt(Math.floor(Math.random() * letters.length));
+          }
+        }
+      }
+    }
+
+    function renderBoard() {
+      const boardEl = document.getElementById('gridBoard');
+      boardEl.style.gridTemplateColumns = `repeat(${GRID_SIZE}, 1fr)`;
+      boardEl.innerHTML = '';
+
+      for (let r = 0; r < GRID_SIZE; r++) {
+        for (let c = 0; c < GRID_SIZE; c++) {
+          const cell = document.createElement('div');
+          cell.className = 'grid-cell';
+          cell.dataset.r = r;
+          cell.dataset.c = c;
+          cell.textContent = grid[r][c];
+
+          cell.addEventListener('mousedown', (e) => startSelection(r, c, e));
+          cell.addEventListener('mouseenter', () => updateSelection(r, c));
+          boardEl.appendChild(cell);
+        }
+      }
+
+      window.addEventListener('mouseup', endSelection);
+      boardEl.addEventListener('touchstart', handleTouchStart, { passive: false });
+      boardEl.addEventListener('touchmove', handleTouchMove, { passive: false });
+      boardEl.addEventListener('touchend', endSelection);
+    }
+
+    function renderWordsList() {
+      const container = document.getElementById('wordsListContainer');
+      container.innerHTML = '';
+
+      VOCABULARY.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'word-card';
+        card.id = `card-${item.word}`;
+        card.innerHTML = `
+          <div class="word-card-top">
+            <span class="word-term">${item.word}</span>
+            <span class="word-status-icon">○</span>
+          </div>
+          <div class="word-meaning">✓ ${item.meaning}</div>
+          <div class="word-detail">${item.detail}</div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    let startCell = null;
+
+    function startSelection(r, c, e) {
+      if (e) e.preventDefault();
+      AudioEngine.playClick();
+      isMouseDown = true;
+      startCell = { r, c };
+      selectedCells = [{ r, c }];
+      highlightSelectedCells();
+    }
+
+    function updateSelection(r, c) {
+      if (!isMouseDown || !startCell) return;
+
+      const dr = r - startCell.r;
+      const dc = c - startCell.c;
+
+      const stepR = dr === 0 ? 0 : dr / Math.abs(dr);
+      const stepC = dc === 0 ? 0 : dc / Math.abs(dc);
+
+      const isHorizontal = dr === 0 && dc !== 0;
+      const isVertical = dc === 0 && dr !== 0;
+      const isDiagonal = Math.abs(dr) === Math.abs(dc) && dr !== 0;
+
+      if (isHorizontal || isVertical || isDiagonal) {
+        selectedCells = [];
+        const length = Math.max(Math.abs(dr), Math.abs(dc)) + 1;
+        for (let i = 0; i < length; i++) {
+          selectedCells.push({
+            r: startCell.r + stepR * i,
+            c: startCell.c + stepC * i
+          });
+        }
+        highlightSelectedCells();
+      }
+    }
+
+    function endSelection() {
+      if (!isMouseDown) return;
+      isMouseDown = false;
+
+      checkSelectionMatch();
+      selectedCells = [];
+      highlightSelectedCells();
+    }
+
+    function handleTouchStart(e) {
+      e.preventDefault();
+      const touch = e.touches[0];
+      const target = document.elementFromPoint(touch.clientX, touch.clientY);
+      if (target && target.classList.contains('grid-cell')) {
+        const r = parseInt(target.dataset.r, 10);
+        const c = parseInt(target.dataset.c, 10);
+        startSelection(r, c);
+      }
+    }
+
+    function handleTouchMove(e) {
+      e.preventDefault();
+      const touch = e.touches[0];
+      const target = document.elementFromPoint(touch.clientX, touch.clientY);
+      if (target && target.classList.contains('grid-cell')) {
+        const r = parseInt(target.dataset.r, 10);
+        const c = parseInt(target.dataset.c, 10);
+        updateSelection(r, c);
+      }
+    }
+
+    function highlightSelectedCells() {
+      document.querySelectorAll('.grid-cell').forEach(cell => {
+        cell.classList.remove('selected');
+      });
+
+      selectedCells.forEach(pos => {
+        const el = document.querySelector(`.grid-cell[data-r="${pos.r}"][data-c="${pos.c}"]`);
+        if (el) el.classList.add('selected');
+      });
+    }
+
+    function checkSelectionMatch() {
+      if (selectedCells.length < 2) return;
+
+      const forwardWord = selectedCells.map(p => grid[p.r][p.c]).join('');
+      const reverseWord = [...forwardWord].reverse().join('');
+
+      for (const item of placedWords) {
+        if (!item.found && (item.word === forwardWord || item.word === reverseWord)) {
+          const matches = item.path.every((p, idx) => {
+            const spForward = selectedCells[idx];
+            const spBackward = selectedCells[selectedCells.length - 1 - idx];
+            return (spForward.r === p.r && spForward.c === p.c) || (spBackward.r === p.r && spBackward.c === p.c);
+          });
+
+          if (matches) {
+            handleWordFound(item);
+            return;
+          }
+        }
+      }
+    }
+
+    function handleWordFound(item) {
+      item.found = true;
+      AudioEngine.playSuccess();
+
+      item.path.forEach(pos => {
+        const cellEl = document.querySelector(`.grid-cell[data-r="${pos.r}"][data-c="${pos.c}"]`);
+        if (cellEl) {
+          cellEl.classList.add('found');
+          cellEl.classList.remove('hint-pulse');
+        }
+      });
+
+      const card = document.getElementById(`card-${item.word}`);
+      if (card) {
+        card.classList.add('found');
+        card.querySelector('.word-status-icon').textContent = '✓';
+      }
+
+      showToast(item);
+      updateProgress();
+    }
+
+    let toastTimeout = null;
+    function showToast(item) {
+      const toast = document.getElementById('discoveryToast');
+      document.getElementById('toastEnglish').textContent = item.word;
+      document.getElementById('toastSpanish').textContent = item.meaning;
+      document.getElementById('toastDesc').textContent = item.detail;
+
+      toast.classList.add('show');
+      clearTimeout(toastTimeout);
+      toastTimeout = setTimeout(() => {
+        toast.classList.remove('show');
+      }, 5000);
+    }
+
+    function updateProgress() {
+      const foundCount = placedWords.filter(w => w.found).length;
+      const total = placedWords.length;
+      const percentage = Math.round((foundCount / total) * 100);
+
+      document.getElementById('progressBar').style.width = `${percentage}%`;
+      document.getElementById('progressText').textContent = `${foundCount} / ${total} Palabras`;
+      document.getElementById('foundCounter').textContent = `${foundCount} de ${total}`;
+
+      if (foundCount === total) {
+        setTimeout(showFinalFeedback, 900);
+      }
+    }
+
+    document.getElementById('hintBtn').addEventListener('click', () => {
+      const unfound = placedWords.filter(w => !w.found);
+      if (unfound.length === 0) return;
+
+      hintsUsed++;
+      const target = unfound[Math.floor(Math.random() * unfound.length)];
+      const firstCell = target.path[0];
+      const cellEl = document.querySelector(`.grid-cell[data-r="${firstCell.r}"][data-c="${firstCell.c}"]`);
+      if (cellEl) {
+        cellEl.classList.add('hint-pulse');
+        setTimeout(() => {
+          cellEl.classList.remove('hint-pulse');
+        }, 3500);
+      }
+    });
+
+    function startTimer() {
+      clearInterval(timerInterval);
+      secondsElapsed = 0;
+      updateTimerDisplay();
+      timerInterval = setInterval(() => {
+        secondsElapsed++;
+        updateTimerDisplay();
+      }, 1000);
+    }
+
+    function updateTimerDisplay() {
+      const mins = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
+      const secs = (secondsElapsed % 60).toString().padStart(2, '0');
+      document.getElementById('timerDisplay').textContent = `${mins}:${secs}`;
+    }
+
+    document.getElementById('resetBtn').addEventListener('click', () => {
+      if (confirm('¿Deseas reiniciar la sopa de letras con un nuevo orden de palabras?')) {
+        initGame();
+      }
+    });
+
+    document.getElementById('soundBtn').addEventListener('click', () => {
+      soundEnabled = !soundEnabled;
+      document.getElementById('soundBtn').innerHTML = soundEnabled ? '🔊 Sonido' : '🔇 Mudo';
+    });
+
+    // 8. RETROALIMENTACIÓN FINAL & EVALUACIÓN PEDAGÓGICA (RRHH)
+    function showFinalFeedback() {
+      clearInterval(timerInterval);
+      AudioEngine.playWin();
+      startConfetti();
+
+      const mins = Math.floor(secondsElapsed / 60).toString().padStart(2, '0');
+      const secs = (secondsElapsed % 60).toString().padStart(2, '0');
+      const totalTimeStr = `${mins}:${secs}`;
+
+      document.getElementById('kpiTime').textContent = totalTimeStr;
+      document.getElementById('kpiHints').textContent = hintsUsed;
+
+      let rank = "⭐⭐⭐ Máster de RRHH";
+      let message = "";
+
+      if (secondsElapsed < 140 && hintsUsed === 0) {
+        rank = "⭐⭐⭐ Líder Estratégico de RRHH";
+        message = "<strong>¡Desempeño Brillante!</strong> Identificaste con total fluidez todo el ciclo de vida del colaborador en inglés. Demuestras una comprensión integral de las etapas clave: desde la atracción (Recruitment & Selection) hasta la fidelización (Motivation & Retention).";
+      } else if (secondsElapsed < 260 && hintsUsed <= 2) {
+        rank = "⭐⭐ Especialista en Talento";
+        message = "<strong>¡Muy Buen Trabajo!</strong> Resolviste con éxito la sopa de letras en un tiempo competitivo. Recuerda que la sincronía entre Compensación (Compensation), Capacitación (Training) y Evaluación de Desempeño (Performance) es el pilar de la retención del talento.";
+      } else {
+        rank = "⭐ Gestor en Formación";
+        message = "<strong>¡Objetivo Cumplido!</strong> Encontraste los 10 conceptos técnicos de Recursos Humanos. Te sugerimos repasar la diferencia entre Capacitación (Training - corto plazo) y Desarrollo (Development - plan de carrera a largo plazo).";
+      }
+
+      document.getElementById('kpiRank').textContent = rank;
+      document.getElementById('feedbackMessage').innerHTML = message;
+
+      const tbody = document.getElementById('glossaryTableBody');
+      tbody.innerHTML = '';
+      VOCABULARY.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><span class="tag-en">${item.word}</span></td>
+          <td><span class="tag-es">${item.meaning}</span></td>
+          <td>${item.detail}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('feedbackModal').classList.add('active');
+    }
+
+    // 9. CONFETTI PASTEL (Pure Canvas)
+    function startConfetti() {
+      const canvas = document.getElementById('confettiCanvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      // Soft pastel celebration confetti
+      const pastelColors = ['#A78BFA', '#FBCFE8', '#BBF7D0', '#BAE6FD', '#FEF08A', '#FECDD3'];
+      const pieces = Array.from({ length: 95 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * -canvas.height,
+        size: Math.random() * 8 + 5,
+        color: pastelColors[Math.floor(Math.random() * pastelColors.length)],
+        speedY: Math.random() * 3.5 + 2,
+        speedX: Math.random() * 2 - 1,
+        angle: Math.random() * 360,
+        spin: Math.random() * 4 - 2
+      }));
+
+      let animationFrame;
+      let duration = 300;
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        pieces.forEach(p => {
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.angle * Math.PI) / 180);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+          ctx.restore();
+
+          p.y += p.speedY;
+          p.x += p.speedX;
+          p.angle += p.spin;
+
+          if (p.y > canvas.height) {
+            p.y = -10;
+            p.x = Math.random() * canvas.width;
+          }
+        });
+
+        duration--;
+        if (duration > 0) {
+          animationFrame = requestAnimationFrame(draw);
+        } else {
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+      }
+
+      draw();
+    }
+
+    function initGame() {
+      document.getElementById('feedbackModal').classList.remove('active');
+      hintsUsed = 0;
+      generateGrid();
+      renderBoard();
+      renderWordsList();
+      updateProgress();
+      startTimer();
+    }
+
+    window.onload = initGame;
+  </script>
+</body>
+</html>
